@@ -1,13 +1,16 @@
 import gleeunit
+import testgl.{DataProvider}
 
 pub fn main() -> Nil {
   gleeunit.main()
 }
 
-// gleeunit test functions end in `_test`
-pub fn hello_world_test() {
-  let name = "Joe"
-  let greeting = "Hello, " <> name <> "!"
-
-  assert greeting == "Hello, Joe!"
+pub fn find_data_providers_finds_test_example_data_providers_test() -> Nil {
+  assert testgl.find_data_providers()
+    == [
+      DataProvider(
+        name: "test_string_upper_case_converts_lowercase_to_uppercase",
+        module: "test_data/data_provider_example",
+      ),
+    ]
 }

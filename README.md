@@ -21,16 +21,16 @@ that return an `Tuple` of test data. Each data provider should have an associate
 `_data_provider` suffix that accepts the inner type of the `Tuple` and performs a test. Here is an example:
 
 ```gleam
-pub fn to_upper_should_convert_lowercase_to_uppercase_data_provider() {
-    #(
-        #("hello", "HELLO"),
-        #("from", "FROM"),
-        #("testgl!", "TESTGL!")
-    )
+import gleam/string
+
+pub fn test_string_upper_case_converts_lowercase_to_uppercase_data_provider() {
+  #(#("hello", "HELLO"), #("from", "FROM"), #("testgl!", "TESTGL!"))
 }
 
-pub fn to_upper_should_convert_lowercase_to_uppercase(test_case: #(String, String)) {
-    assert string.to_upper(test_case.0) == test_case.1
+pub fn test_string_upper_case_converts_lowercase_to_uppercase(
+  test_case: #(String, String),
+) {
+  assert string.uppercase(test_case.0) == test_case.1
 }
 ```
 
@@ -40,19 +40,19 @@ TestGL will pick up these functions and transform them into the following 3 test
 ```gleam
 import string_test
 
-pub fn to_upper_should_convert_lowercase_to_uppercase_0_test() {
-    string_test.to_upper_should_convert_lowercase_to_uppercase_data_provider().0
-    |> string_test.to_upper_should_convert_lowercase_to_uppercase
+pub fn test_string_upper_case_converts_lowercase_to_uppercase_0_test() {
+    string_test.test_string_upper_case_converts_lowercase_to_uppercase_data_provider().0
+    |> string_test.test_string_upper_case_converts_lowercase_to_uppercase
 }
 
-pub fn to_upper_should_convert_lowercase_to_uppercase_1_test() {
-    string_test.to_upper_should_convert_lowercase_to_uppercase_data_provider().1
-    |> string_test.to_upper_should_convert_lowercase_to_uppercase
+pub fn test_string_upper_case_converts_lowercase_to_uppercase_1_test() {
+    string_test.test_string_upper_case_converts_lowercase_to_uppercase_data_provider().1
+    |> string_test.test_string_upper_case_converts_lowercase_to_uppercase
 }
 
-pub fn to_upper_should_convert_lowercase_to_uppercase_2_test() {
-    string_test.to_upper_should_convert_lowercase_to_uppercase_data_provider().2
-    |> string_test.to_upper_should_convert_lowercase_to_uppercase
+pub fn test_string_upper_case_converts_lowercase_to_uppercase_2_test() {
+    string_test.test_string_upper_case_converts_lowercase_to_uppercase_data_provider().2
+    |> string_test.test_string_upper_case_converts_lowercase_to_uppercase
 }
 ```
 
