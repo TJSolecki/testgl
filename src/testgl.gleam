@@ -1,6 +1,9 @@
+import glance.{
+  type Expression, type Statement, Expression, Function, Public, Tuple,
+}
+import gleam/bool
 import gleam/list
 import gleam/option.{None, Some}
-import gleam/regexp.{Options}
 import gleam/result
 import gleam/string
 import simplifile.{type FileError}
@@ -11,6 +14,8 @@ pub type DataProvider {
     name: String,
     // The module the data provide appears in. E.g. 'internal/string_extra'.
     module: String,
+    // The number of test cases returned by the data provider
+    num_test_cases: Int,
   )
 }
 
@@ -32,30 +37,45 @@ pub fn find_data_providers() -> Result(List(DataProvider), FileError) {
 fn get_data_providers_from_file(
   filename: String,
 ) -> Result(List(DataProvider), FileError) {
-  let assert Ok(data_provider_regexp) =
-    regexp.compile(
-      "pub fn ([a-z0-9_]+)_data_provider\\(\\)",
-      with: Options(multi_line: False, case_insensitive: False),
-    )
   use content <- result.try(simplifile.read(filename))
-  regexp.scan(with: data_provider_regexp, content: content)
-  |> list.map(fn(match) {
-    DataProvider(
-      module: string.slice(
-        filename,
-        string.length("test/"),
-        string.length(filename)
-          - string.length("test/")
-          - string.length(".gleam"),
-      ),
-      name: list.first(match.submatches)
-        |> result.lazy_unwrap(fn() {
-          panic as "there was no submatch for the data_provider name"
-        })
-        |> option.lazy_unwrap(fn() { panic as "the submatch was empty" }),
+  let assert Ok(ast) = glance.module(content)
+  list.flat_map(ast.functions, fn(function_definition) {
+    let function = function_definition.definition
+    use <- bool.guard(
+      !string.ends_with(function.name, "_data_provider")
+        || function.publicity != Public,
+      [],
     )
+    let num_test_cases =
+      get_returned_tuple_elements(function.body) |> list.length
+    use <- bool.guard(num_test_cases == 0, [])
+    [
+      DataProvider(
+        module: string.slice(
+          filename,
+          string.length("test/"),
+          string.length(filename)
+            - string.length("test/")
+            - string.length(".gleam"),
+        ),
+        name: string.slice(
+          function.name,
+          0,
+          string.length(function.name) - string.length("_data_provider"),
+        ),
+        num_test_cases: num_test_cases,
+      ),
+    ]
   })
   |> Ok
+}
+
+fn get_returned_tuple_elements(statements: List(Statement)) -> List(Expression) {
+  case statements {
+    [Expression(Tuple(elements: elements, ..))] -> elements
+    [_, ..rest] -> get_returned_tuple_elements(rest)
+    _ -> []
+  }
 }
 
 /// Returns a list of relative paths to gleam files in the specified directory
