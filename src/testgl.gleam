@@ -1,6 +1,6 @@
-import gleam/io
 import gleam/list
 import gleam/option.{None, Some}
+import gleam/regexp.{Options}
 import gleam/result
 import gleam/string
 import simplifile.{type FileError}
@@ -15,12 +15,47 @@ pub type DataProvider {
 }
 
 pub fn main() -> Nil {
-  echo find_gleam_files_in_directory("test")
+  echo find_data_providers()
   Nil
 }
 
-pub fn find_data_providers() -> List(DataProvider) {
-  []
+pub fn find_data_providers() -> Result(List(DataProvider), FileError) {
+  use gleam_files <- result.try(find_gleam_files_in_directory("test"))
+  let #(data_providers, errors) =
+    gleam_files |> list.map(get_data_providers_from_file) |> result.partition
+  case errors {
+    [error, ..] -> Error(error)
+    [] -> Ok(list.flatten(data_providers))
+  }
+}
+
+fn get_data_providers_from_file(
+  filename: String,
+) -> Result(List(DataProvider), FileError) {
+  let assert Ok(data_provider_regexp) =
+    regexp.compile(
+      "pub fn ([a-z0-9_]+)_data_provider\\(\\)",
+      with: Options(multi_line: False, case_insensitive: False),
+    )
+  use content <- result.try(simplifile.read(filename))
+  regexp.scan(with: data_provider_regexp, content: content)
+  |> list.map(fn(match) {
+    DataProvider(
+      module: string.slice(
+        filename,
+        string.length("test/"),
+        string.length(filename)
+          - string.length("test/")
+          - string.length(".gleam"),
+      ),
+      name: list.first(match.submatches)
+        |> result.lazy_unwrap(fn() {
+          panic as "there was no submatch for the data_provider name"
+        })
+        |> option.lazy_unwrap(fn() { panic as "the submatch was empty" }),
+    )
+  })
+  |> Ok
 }
 
 /// Returns a list of relative paths to gleam files in the specified directory
@@ -30,8 +65,7 @@ pub fn find_gleam_files_in_directory(
   use filenames <- result.try(simplifile.read_directory(directory))
   let files = filenames |> list.map(string.append(directory <> "/", _))
   let gleam_files =
-    files
-    |> list.filter(fn(file) { string.ends_with(file, ".gleam") })
+    list.filter(files, fn(file) { string.ends_with(file, ".gleam") })
   let directory_results =
     list.map(files, fn(file) {
       simplifile.is_directory(file)
