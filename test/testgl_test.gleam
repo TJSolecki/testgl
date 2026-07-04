@@ -6,7 +6,7 @@ pub fn main() -> Nil {
 }
 
 pub fn find_data_providers_finds_test_example_data_providers_test() -> Nil {
-  assert testgl.find_data_providers()
+  assert testgl.find_data_providers("test")
     == Ok([
       DataProvider(
         name: "test_string_upper_case_converts_lowercase_to_uppercase",

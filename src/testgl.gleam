@@ -1,6 +1,4 @@
-import glance.{
-  type Expression, type Statement, Expression, Function, Public, Tuple,
-}
+import glance.{type Expression, type Statement, Expression, Public, Tuple}
 import gleam/bool
 import gleam/list
 import gleam/option.{None, Some}
@@ -20,24 +18,31 @@ pub type DataProvider {
 }
 
 pub fn main() -> Nil {
-  echo find_data_providers()
+  echo find_data_providers("test")
   Nil
 }
 
-pub fn find_data_providers() -> Result(List(DataProvider), FileError) {
-  use gleam_files <- result.try(find_gleam_files_in_directory("test"))
+pub fn find_data_providers(
+  path: String,
+) -> Result(List(DataProvider), FileError) {
+  use gleam_files <- result.try(find_gleam_files_in_directory(path))
   let #(data_providers, errors) =
-    gleam_files |> list.map(get_data_providers_from_file) |> result.partition
+    gleam_files
+    |> list.map(fn(filename) {
+      simplifile.read(filename)
+      |> result.map(get_data_providers_from_file_content(filename, _))
+    })
+    |> result.partition
   case errors {
     [error, ..] -> Error(error)
     [] -> Ok(list.flatten(data_providers))
   }
 }
 
-fn get_data_providers_from_file(
+pub fn get_data_providers_from_file_content(
   filename: String,
-) -> Result(List(DataProvider), FileError) {
-  use content <- result.try(simplifile.read(filename))
+  content: String,
+) -> List(DataProvider) {
   let assert Ok(ast) = glance.module(content)
   list.flat_map(ast.functions, fn(function_definition) {
     let function = function_definition.definition
@@ -67,7 +72,6 @@ fn get_data_providers_from_file(
       ),
     ]
   })
-  |> Ok
 }
 
 fn get_returned_tuple_elements(statements: List(Statement)) -> List(Expression) {

@@ -58,7 +58,7 @@ pub fn test_string_upper_case_converts_lowercase_to_uppercase_2_test() {
 
 ## Plan
 
--   [ ] Write `find_data_providers() -> List(DataProvider)` function that returns the names of each public data provider
+-   [x] Write `find_data_providers() -> List(DataProvider)` function that returns the names of each public data provider
         function in the curnnet project
 -   [ ] Write `expand_data_provider(data_provider: DataProvider) -> Nil` function which writes the generated `.gleam`
         files containing the tests defined by the data provider and its associated method and writes them to
