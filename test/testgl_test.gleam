@@ -1,5 +1,6 @@
+import data_provider.{DataProvider}
 import gleeunit
-import testgl.{DataProvider}
+import testgl
 
 pub fn main() -> Nil {
   gleeunit.main()

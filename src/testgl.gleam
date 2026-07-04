@@ -1,3 +1,4 @@
+import data_provider.{type DataProvider, DataProvider}
 import glance.{type Expression, type Statement, Expression, Public, Tuple}
 import gleam/bool
 import gleam/list
@@ -5,17 +6,6 @@ import gleam/option.{None, Some}
 import gleam/result
 import gleam/string
 import simplifile.{type FileError}
-
-pub type DataProvider {
-  DataProvider(
-    // The name of the DataProvider function minus the '_data_provider' suffix.
-    name: String,
-    // The module the data provide appears in. E.g. 'internal/string_extra'.
-    module: String,
-    // The number of test cases returned by the data provider
-    num_test_cases: Int,
-  )
-}
 
 pub fn main() -> Nil {
   echo find_data_providers("test")
