@@ -1,0 +1,9 @@
+import foo/bar.{
+  foo,
+  foo_data_provider,
+}
+
+pub fn foo_0_test() {
+  foo_data_provider().0
+  |> foo
+}

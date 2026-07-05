@@ -1,0 +1,19 @@
+import string_test.{
+  string_upper_case_converts_lowercase_to_uppercase,
+  string_upper_case_converts_lowercase_to_uppercase_data_provider,
+}
+
+pub fn string_upper_case_converts_lowercase_to_uppercase_0_test() {
+  string_upper_case_converts_lowercase_to_uppercase_data_provider().0
+  |> string_upper_case_converts_lowercase_to_uppercase
+}
+
+pub fn string_upper_case_converts_lowercase_to_uppercase_1_test() {
+  string_upper_case_converts_lowercase_to_uppercase_data_provider().1
+  |> string_upper_case_converts_lowercase_to_uppercase
+}
+
+pub fn string_upper_case_converts_lowercase_to_uppercase_2_test() {
+  string_upper_case_converts_lowercase_to_uppercase_data_provider().2
+  |> string_upper_case_converts_lowercase_to_uppercase
+}
