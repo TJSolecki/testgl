@@ -1,0 +1,6 @@
+-   [ ] Add handling to remove generated files for deleted or moved data providers
+-   [ ] Add real error handling with helpful error messages
+-   [ ] Add logs for when generated data provider test cases are added, modified, or deleted
+-   [ ] Look into if we can parralize writes and see if that makes things any faster
+-   [ ] Improve docs
+-   [ ] Publish to hex
