@@ -7,14 +7,17 @@ import gleam/result
 import gleam/string
 import simplifile.{type FileError}
 
+const path_to_test_dir = "test/"
+
+const path_to_generated_data_providers = "test/generated/"
+
 pub fn main() -> Nil {
-  echo find_data_providers("test")
+  let assert Ok(data_providers) = get_data_providers(path_to_test_dir)
+  list.each(data_providers, write_generated_tests)
   Nil
 }
 
-pub fn find_data_providers(
-  path: String,
-) -> Result(List(DataProvider), FileError) {
+pub fn get_data_providers(path: String) -> Result(List(DataProvider), FileError) {
   use gleam_files <- result.try(find_gleam_files_in_directory(path))
   let #(data_providers, errors) =
     gleam_files
@@ -90,10 +93,11 @@ pub fn get_data_providers_from_file_content(
       DataProvider(
         module: string.slice(
           filename,
-          string.length("test/"),
+          string.length(path_to_test_dir) + 1,
           string.length(filename)
-            - string.length("test/")
-            - string.length(".gleam"),
+            - string.length(path_to_test_dir)
+            - string.length(".gleam")
+            - 1,
         ),
         name: string.slice(
           function.name,
@@ -112,4 +116,17 @@ fn get_returned_tuple_elements(statements: List(Statement)) -> List(Expression) 
     [_, ..rest] -> get_returned_tuple_elements(rest)
     _ -> []
   }
+}
+
+fn write_generated_tests(data_provider: DataProvider) -> Nil {
+  let directory =
+    path_to_generated_data_providers <> data_provider.module <> "/"
+  let filename = directory <> data_provider.name <> ".gleam"
+  let assert Ok(_) = simplifile.create_directory_all(directory)
+  let assert Ok(_) =
+    simplifile.write(
+      to: filename,
+      contents: data_provider.to_test_source(data_provider),
+    )
+  Nil
 }

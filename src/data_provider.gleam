@@ -1,6 +1,5 @@
 import gleam/bool
 import gleam/int
-import gleam/list
 
 pub type DataProvider {
   DataProvider(
