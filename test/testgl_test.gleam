@@ -5,6 +5,7 @@ import testgl
 pub fn main() -> Nil {
   testgl.main()
   gleeunit.main()
+  Nil
 }
 
 pub fn get_data_providers_finds_test_example_data_providers_test() -> Nil {

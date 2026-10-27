@@ -13,8 +13,14 @@ const path_to_generated_data_providers = "test/generated/"
 
 pub fn main() -> Nil {
   let assert Ok(data_providers) = get_data_providers(path_to_test_dir)
+  tear_down()
   list.each(data_providers, write_generated_tests)
   Nil
+}
+
+pub fn tear_down() -> Nil {
+  simplifile.delete(path_to_generated_data_providers)
+  |> result.unwrap(Nil)
 }
 
 pub fn get_data_providers(path: String) -> Result(List(DataProvider), FileError) {
