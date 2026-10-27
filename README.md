@@ -4,7 +4,7 @@ A testing library which adds Java's TestNG's @DataProvider pattern to gleam.
 
 ## Usage
 
-To setup test GL, add the following to your `test/<package_name>_test.gleam` file
+To setup TestGL, add the following to your `test/<package_name>_test.gleam` file
 
 ```gleam
 import gleeunit
@@ -58,14 +58,3 @@ pub fn string_upper_case_converts_lowercase_to_uppercase_2_test() {
   |> string_upper_case_converts_lowercase_to_uppercase
 }
 ```
-
-## Plan
-
--   [x] Write `find_data_providers() -> List(DataProvider)` function that returns the names of each public data provider
-        function in the curnnet project
--   [ ] Write `expand_data_provider(data_provider: DataProvider) -> Nil` function which writes the generated `.gleam`
-        files containing the tests defined by the data provider and its associated method and writes them to
-        `test/testgl/<data_provider_name>.gleam`.
--   [ ] Write `main() -> Nil` entrypoint function which will either generate tests if any are missing and panic with
-        a message letting the user know that tests were successfully generated, or if generated tests are present and
-        up to date, do nothing.
